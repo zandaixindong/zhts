@@ -202,8 +202,8 @@ const SeatManager: React.FC = () => {
                       </td>
                       <td className="px-6 py-4">
                         <div className="flex gap-3">
-                          {s.hasOutlet && <Power className="w-3.5 h-3.5 text-slate-400" title="带插座" />}
-                          {s.window && <Wind className="w-3.5 h-3.5 text-slate-400" title="靠窗" />}
+                          {s.hasOutlet && <span title="带插座"><Power className="w-3.5 h-3.5 text-slate-400" /></span>}
+                          {s.window && <span title="靠窗"><Wind className="w-3.5 h-3.5 text-slate-400" /></span>}
                           {!s.hasOutlet && !s.window && <span className="text-slate-300">-</span>}
                         </div>
                       </td>

@@ -1,0 +1,47 @@
+{
+  "name": "ai-library-platform",
+  "version": "1.0.0",
+  "private": true,
+  "workspaces": [
+    "backend",
+    "frontend",
+    "admin-frontend"
+  ],
+  "scripts": {
+    "dev": "concurrently \"npm run dev:backend\" \"npm run dev:frontend\" \"npm run dev:admin\"",
+    "dev:tunnel": "concurrently \"npm run dev:backend\" \"npm run dev:frontend\" \"npm run dev:admin\" \"npm run tunnel\"",
+    "dev:backend": "cd backend && npm run dev",
+    "dev:frontend": "cd frontend && npm run dev",
+    "dev:admin": "cd admin-frontend && npm run dev",
+    "tunnel": "node scripts/tunnel.js",
+    "build": "cd backend && npm run build && cd ../frontend && npm run build && cd ../admin-frontend && npm run build",
+    "seed": "cd backend && npm run seed",
+    "postinstall": "prisma generate",
+    "lint": "eslint . --ext .ts,.tsx",
+    "lint:fix": "eslint . --ext .ts,.tsx --fix",
+    "format": "prettier --write \"**/*.{ts,tsx,js,json,md}\"",
+    "format:check": "prettier --check \"**/*.{ts,tsx,js,json,md}\"",
+    "test": "vitest run",
+    "test:watch": "vitest"
+  },
+  "devDependencies": {
+    "@testing-library/jest-dom": "^6.9.1",
+    "@testing-library/react": "^16.3.2",
+    "@typescript-eslint/eslint-plugin": "^8.58.0",
+    "@typescript-eslint/parser": "^8.58.0",
+    "concurrently": "^8.2.2",
+    "eslint": "^9.39.4",
+    "eslint-config-prettier": "^10.1.8",
+    "eslint-plugin-react": "^7.37.5",
+    "eslint-plugin-react-hooks": "^7.0.1",
+    "jsdom": "^29.0.1",
+    "localtunnel": "^2.0.2",
+    "prettier": "^3.8.1",
+    "qrcode-terminal": "^0.12.0",
+    "vitest": "^4.1.2"
+  },
+  "optionalDependencies": {
+    "mysql2": "^3.20.0",
+    "pg": "^8.20.0"
+  }
+}

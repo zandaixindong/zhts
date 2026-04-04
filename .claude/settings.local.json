@@ -1,0 +1,19 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npm run:*)",
+      "Bash(npx prisma:*)",
+      "Bash(pkill -f \"ts-node-dev\")",
+      "Bash(curl -s http://localhost:3001/api/health)",
+      "Bash(curl:*)",
+      "Bash(kill 1932:*)",
+      "Bash(npx vite:*)",
+      "Bash(npm install:*)",
+      "Bash(find src/routes -name \"*.ts\" -exec sed -i '' 's|../../types/response|../types/response|g' {} \\\\;)",
+      "Bash(npx vitest:*)"
+    ]
+  },
+  "enabledPlugins": {
+    "superpowers@claude-plugins-official": false
+  }
+}

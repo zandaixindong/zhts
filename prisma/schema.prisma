@@ -1,0 +1,146 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String   @id @default(uuid())
+  name      String
+  email     String   @unique
+  password  String
+  role      String   @default("user") // "user" or "admin"
+  interests Json
+  violationCount Int  @default(0) // 违约次数，达到上限不能预约
+  createdAt DateTime @default(now())
+
+  books         BookCheckout[]
+  seats         SeatReservation[]
+  notifications Notification[]
+  bookNotifications BookNotification[]
+}
+
+model Book {
+  id            String    @id @default(uuid())
+  title         String
+  author        String
+  isbn          String?   @unique
+  publisher     String?
+  year          Int?
+  category      String
+  location      String
+  status        String
+  format        String
+  electronicUrl String?
+  description   String?
+  content       String?
+  createdAt     DateTime  @default(now())
+
+  checkouts       BookCheckout[]
+  notifications   BookNotification[]
+}
+
+model BookCheckout {
+  id          String   @id @default(uuid())
+  bookId      String
+  book        Book     @relation(fields: [bookId], references: [id], onDelete: Cascade)
+  userId      String
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  checkoutDate DateTime
+  dueDate     DateTime
+  returned    Boolean  @default(false)
+}
+
+model BookNotification {
+  id          String   @id @default(uuid())
+  bookId      String
+  book        Book     @relation(fields: [bookId], references: [id], onDelete: Cascade)
+  userId      String
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  notified    Boolean  @default(false)
+  createdAt   DateTime @default(now())
+}
+
+model Floor {
+  id          String  @id @default(uuid())
+  number      Int
+  name        String
+  width       Float?    // Floor plan width in coordinate units
+  height      Float?    // Floor plan height in coordinate units
+  planAnnotations Json?  // Custom plan annotations - rectangles for regions
+  seats       Seat[]
+  atmosphereHistory AtmosphereHistory[]
+}
+
+model Seat {
+  id          String  @id @default(uuid())
+  floorId     String
+  floor       Floor   @relation(fields: [floorId], references: [id], onDelete: Cascade)
+  seatNumber  String
+  x           Float
+  y           Float
+  hasOutlet   Boolean @default(false)
+  zone        String
+  window      Boolean @default(false)
+  status      String
+  currentReservationId String?
+  reservations SeatReservation[]
+}
+
+model SeatReservation {
+  id          String   @id @default(uuid())
+  seatId      String
+  seat        Seat     @relation(fields: [seatId], references: [id], onDelete: Cascade)
+  userId      String
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  startTime   DateTime
+  endTime     DateTime
+  status      String   @default("reserved") // reserved, checked_in, temporarily_left, completed, canceled, expired
+  checkedIn   Boolean  @default(false)
+  canceled    Boolean  @default(false)
+  createdAt   DateTime @default(now())
+}
+
+model LibraryEvent {
+  id          String    @id @default(uuid())
+  title       String
+  description String
+  category    String
+  date        DateTime
+  location    String
+  interests   Json
+  createdAt   DateTime  @default(now())
+}
+
+model Notification {
+  id          String   @id @default(uuid())
+  userId      String
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  title       String
+  content     String
+  type        String
+  read        Boolean  @default(false)
+  createdAt   DateTime @default(now())
+}
+
+model AtmosphereHistory {
+  id          String   @id @default(uuid())
+  floorId     String
+  floor       Floor    @relation(fields: [floorId], references: [id], onDelete: Cascade)
+  noise       Int      // 噪音评分 0-100
+  crowding    Int      // 拥挤评分 0-100
+  brightness  Int      // 采光评分 0-100
+  overall     Int      // 整体氛围评分 0-100
+  recordedAt  DateTime @default(now())
+}
+
+model SearchQuery {
+  id          String   @id @default(uuid())
+  query       String
+  results     Int
+  userId      String?
+  createdAt   DateTime @default(now())
+}

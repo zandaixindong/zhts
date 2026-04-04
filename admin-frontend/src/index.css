@@ -1,0 +1,120 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  background:
+    radial-gradient(circle at top left, rgba(129, 140, 248, 0.16), transparent 24%),
+    radial-gradient(circle at top right, rgba(34, 211, 238, 0.12), transparent 22%),
+    linear-gradient(180deg, #f8fbff 0%, #eef2ff 46%, #f8fafc 100%);
+  color: #0f172a;
+}
+
+/* Scrollbar */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: #f1f1f1; }
+::-webkit-scrollbar-thumb { background: #c5c5c5; border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: #a0a0a0; }
+
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(16px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes scaleIn {
+  from { opacity: 0; transform: scale(0.96); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-4px); }
+  75% { transform: translateX(4px); }
+}
+
+@layer components {
+  .admin-shell {
+    @apply relative min-h-screen overflow-hidden;
+  }
+
+  .admin-shell::before,
+  .admin-shell::after {
+    content: '';
+    position: absolute;
+    border-radius: 9999px;
+    filter: blur(80px);
+    opacity: 0.45;
+    pointer-events: none;
+  }
+
+  .admin-shell::before {
+    width: 20rem;
+    height: 20rem;
+    top: 3rem;
+    right: -4rem;
+    background: rgba(99, 102, 241, 0.24);
+  }
+
+  .admin-shell::after {
+    width: 16rem;
+    height: 16rem;
+    bottom: 6rem;
+    left: -3rem;
+    background: rgba(34, 211, 238, 0.18);
+  }
+
+  .admin-panel {
+    @apply rounded-[24px] border border-white/70 bg-white/80 shadow-[0_28px_90px_-42px_rgba(79,70,229,0.45)] backdrop-blur-2xl;
+  }
+
+  .admin-stat-card {
+    @apply rounded-2xl border border-white/70 bg-white/80 shadow-[0_24px_70px_-36px_rgba(79,70,229,0.32)] backdrop-blur-xl;
+  }
+
+  .admin-chip {
+    @apply inline-flex items-center gap-2 rounded-full border border-slate-200 bg-white/80 px-3 py-1.5 text-xs font-medium text-slate-600 shadow-sm;
+  }
+}
+
+@layer utilities {
+  .animate-shimmer {
+    background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+    background-size: 200% 100%;
+    animation: shimmer 1.5s infinite;
+  }
+
+  .animate-fade-in {
+    animation: fadeIn 0.25s ease-out both;
+  }
+
+  .animate-fade-in-up {
+    animation: fadeInUp 0.35s ease-out both;
+  }
+
+  .animate-scale-in {
+    animation: scaleIn 0.25s ease-out both;
+  }
+
+  .animate-shake {
+    animation: shake 0.35s ease-out both;
+  }
+}

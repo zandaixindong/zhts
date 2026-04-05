@@ -8,6 +8,8 @@
     "strict": true,
     "esModuleInterop": true,
     "skipLibCheck": true,
+    "sourceMap": false,
+    "incremental": false,
     "forceConsistentCasingInFileNames": true,
     "resolveJsonModule": true
   },

@@ -22,10 +22,12 @@ RUN npx prisma generate
 
 # 编译 TypeScript
 WORKDIR /app/backend
+ENV NODE_OPTIONS="--max-old-space-size=450"
 RUN npm run build
 
 # 暴露端口
 EXPOSE 3001
 
 # 启动脚本：同步数据库并启动服务
+ENV NODE_OPTIONS="--max-old-space-size=450"
 CMD npx prisma db push && npm run start

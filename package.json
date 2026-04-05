@@ -15,7 +15,7 @@
     "dev:admin": "cd admin-frontend && npm run dev",
     "tunnel": "node scripts/tunnel.js",
     "build": "cd backend && npm run build && cd ../frontend && npm run build && cd ../admin-frontend && npm run build",
-    "build:backend": "cd backend && npm run build",
+    "build:backend": "cd backend && tsc --noEmit && cd backend && tsc",
     "seed": "cd backend && npm run seed",
     "postinstall": "prisma generate",
     "lint": "eslint . --ext .ts,.tsx",

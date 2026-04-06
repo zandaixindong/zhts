@@ -8,6 +8,7 @@ struct ChatView: View {
     @State private var inputText = ""
     @State private var isTyping = false
     @State private var hasError = false
+    @State private var cancellables = Set<AnyCancellable>() // 🛠️ 修复：添加缺失的变量
 
     var body: some View {
         NavigationView {

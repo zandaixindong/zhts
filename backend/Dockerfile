@@ -11,6 +11,9 @@ COPY package*.json ./
 COPY backend/package*.json ./backend/
 COPY prisma ./prisma/
 
+# 🛠️ 关键修复：设置国内镜像源，防止 ECONNRESET 网络错误
+RUN npm config set registry https://registry.npmmirror.com
+
 # 安装依赖
 RUN npm install
 
@@ -28,6 +31,6 @@ RUN npm run build
 # 暴露端口
 EXPOSE 3001
 
-# 启动脚本：同步数据库并启动服务
+# 启动脚本：同步数据库、执行种子数据注入并启动服务
 ENV NODE_OPTIONS="--max-old-space-size=450"
 CMD npx prisma db push --accept-data-loss && npm run seed && npm run start

@@ -8,14 +8,19 @@ if ! [ -x "$(command -v docker)" ]; then
   curl -fsSL https://get.docker.com | bash -s docker
 fi
 
-# 2. 准备 Web 托管目录 (需要 root 权限)
-echo "📂 准备 Web 托管路径..."
+# 2. 准备 Web 托管目录 (强制清空旧文件)
+echo "📂 清理并准备 Web 托管路径..."
+rm -rf /var/www/library/frontend/*
+rm -rf /var/www/library/admin/*
 mkdir -p /var/www/library/frontend
 mkdir -p /var/www/library/admin
 
 # 3. 构建前端项目
-echo "🏗️ 正在构建用户前台..."
-cd frontend && npm install && VITE_API_URL=https://guhongli.top/api npm run build
+echo "🏗️ 正在强制构建用户前台..."
+cd frontend
+rm -rf dist
+npm install
+VITE_API_URL=https://guhongli.top/api npm run build
 if [ -d "dist" ]; then
     cp -r dist/* /var/www/library/frontend/
     echo "✅ 用户前台构建成功"
@@ -25,8 +30,11 @@ else
 fi
 cd ..
 
-echo "🏗️ 正在构建管理后台..."
-cd admin-frontend && npm install && VITE_API_URL=https://guhongli.top/api npm run build
+echo "🏗️ 正在强制构建管理后台..."
+cd admin-frontend
+rm -rf dist
+npm install
+VITE_API_URL=https://guhongli.top/api npm run build
 if [ -d "dist" ]; then
     cp -r dist/* /var/www/library/admin/
     echo "✅ 管理后台构建成功"

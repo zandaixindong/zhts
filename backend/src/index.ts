@@ -70,7 +70,7 @@ process.on('unhandledRejection', (reason) => {
 });
 
 // Start server
-app.listen(PORT, () => {
+app.listen(PORT as number, '0.0.0.0', () => {
   logger.info('AI Library Platform API server started', {
     port: PORT,
     frontendUrl: process.env.FRONTEND_URL || 'http://localhost:5173',

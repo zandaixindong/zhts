@@ -11,6 +11,7 @@ services:
       - DATABASE_URL=file:./prisma/dev.db
       - API_KEY=426b3899543a42f6ba4c9f617534b700.ufp4iLsJQc34zgeK
       - MODEL_NAME=GLM-4.7-Flash
+      - OPENAI_BASE_URL=https://open.bigmodel.cn/api/paas/v4
       - NODE_ENV=production
       - FRONTEND_URL=https://guhongli.top
       - ADMIN_URL=https://admin.guhongli.top

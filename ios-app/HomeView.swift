@@ -1,92 +1,95 @@
 import SwiftUI
+import Combine
 
 struct HomeView: View {
     @StateObject private var network = NetworkManager.shared
     @State private var searchText = ""
     @State private var books: [Book] = []
-    @State private var aiMessage = "欢迎来到 AI 智慧图书馆"
+    @State private var aiMessage = "想读点什么？告诉我你的需求..."
     @State private var isSearching = false
+    @State private var searchError = false
     @State private var cancellables = Set<AnyCancellable>()
 
     var body: some View {
-        VStack(spacing: 0) {
-            // AI Header - Glassmorphism style
-            VStack(alignment: .leading, spacing: 8) {
-                HStack {
-                    Image(systemName: "sparkles")
-                        .font(.title3)
-                        .foregroundColor(.indigo)
-                    Text("AI 空间助理")
-                        .font(.headline)
-                        .foregroundColor(.indigo)
-                    Spacer()
+        NavigationView {
+            VStack(spacing: 0) {
+                // AI Header - Glassmorphism style
+                VStack(alignment: .leading, spacing: 8) {
+                    HStack {
+                        Image(systemName: "sparkles")
+                            .font(.title3)
+                            .foregroundColor(.indigo)
+                        Text("AI 空间助理")
+                            .font(.headline)
+                            .foregroundColor(.indigo)
+                        Spacer()
+                    }
+                    
+                    Text(aiMessage)
+                        .font(.system(.subheadline, design: .rounded))
+                        .foregroundColor(.secondary)
+                        .lineLimit(2)
+                        .fixedSize(horizontal: false, vertical: true)
                 }
-                
-                Text(aiMessage)
-                    .font(.system(.subheadline, design: .rounded))
-                    .foregroundColor(.secondary)
-                    .lineLimit(2)
-                    .fixedSize(horizontal: false, vertical: true)
-            }
-            .padding()
-            .background(
-                RoundedRectangle(cornerRadius: 20)
-                    .fill(Color.white.opacity(0.8))
-                    .background(Blur(style: .systemThinMaterial))
-                    .shadow(color: Color.black.opacity(0.05), radius: 10, x: 0, y: 5)
-            )
-            .padding()
+                .padding()
+                .glassBackground()
+                .padding()
 
-            // Search Bar
-            HStack {
-                Image(systemName: "magnifyingglass")
-                    .foregroundColor(.gray)
-                TextField("输入你想读的书或需求...", text: $searchText)
-                    .submitLabel(.search)
-                    .onSubmit { performSearch() }
-                
-                if !searchText.isEmpty {
-                    Button(action: { searchText = "" }) {
-                        Image(systemName: "xmark.circle.fill")
-                            .foregroundColor(.gray)
+                // Search Bar
+                HStack {
+                    Image(systemName: "magnifyingglass")
+                        .foregroundColor(.gray)
+                    TextField("输入你想读的书或需求...", text: $searchText)
+                        .submitLabel(.search)
+                        .onSubmit { performSearch() }
+                    
+                    if !searchText.isEmpty {
+                        Button(action: { searchText = "" }) {
+                            Image(systemName: "xmark.circle.fill")
+                                .foregroundColor(.gray)
+                        }
                     }
                 }
-            }
-            .padding()
-            .background(Color(.systemGray6))
-            .cornerRadius(15)
-            .padding(.horizontal)
+                .padding()
+                .background(Color(.systemGray6))
+                .cornerRadius(15)
+                .padding(.horizontal)
 
-            if isSearching {
-                ProgressView()
-                    .padding(.top, 40)
-                Text("AI 正在检索馆藏...")
-                    .font(.caption)
-                    .foregroundColor(.secondary)
-                    .padding()
+                if isSearching {
+                    ProgressView()
+                        .padding(.top, 40)
+                    Text("AI 正在全馆检索...")
+                        .font(.caption)
+                        .foregroundColor(.secondary)
+                        .padding()
+                    Spacer()
+                } else if searchError {
+                    ErrorPlaceholderView(title: "搜索请求超时") { performSearch() }
+                } else {
+                    // Results
+                    List(books) { book in
+                        BookRow(book: book)
+                            .listRowSeparator(.hidden)
+                            .listRowBackground(Color.clear)
+                    }
+                    .listStyle(.plain)
+                }
             }
-
-            // Results
-            List(books) { book in
-                BookRow(book: book)
-                    .listRowSeparator(.hidden)
-                    .listRowBackground(Color.clear)
-            }
-            .listStyle(.plain)
-            .refreshable {
-                // Refresh logic
-            }
+            .background(Color(.systemGroupedBackground))
+            .navigationTitle("发现")
         }
-        .background(Color(.systemGroupedBackground))
     }
 
     func performSearch() {
         guard !searchText.isEmpty else { return }
         isSearching = true
+        searchError = false
         
         network.request("/books/search", method: "POST", body: ["query": searchText, "userId": "demo-user-id"])
-            .sink(receiveCompletion: { _ in isSearching = false },
-                  receiveValue: { (response: AISearchResponse) in
+            .sink(receiveCompletion: { completion in
+                isSearching = false
+                if case .failure = completion { self.searchError = true }
+            }, receiveValue: { (response: AISearchResponse) in
                 self.books = response.books
                 self.aiMessage = response.message
             })
@@ -146,16 +149,5 @@ struct StatusBadge: View {
             .background(status == "available" ? Color.green.opacity(0.1) : Color.red.opacity(0.1))
             .foregroundColor(status == "available" ? .green : .red)
             .clipShape(Capsule())
-    }
-}
-
-// Helper for Blur Effect
-struct Blur: UIViewRepresentable {
-    var style: UIBlurEffect.Style = .systemMaterial
-    func makeUIView(context: Context) -> UIVisualEffectView {
-        return UIVisualEffectView(effect: UIBlurEffect(style: style))
-    }
-    func updateUIView(_ uiView: UIVisualEffectView, context: Context) {
-        uiView.effect = UIBlurEffect(style: style)
     }
 }

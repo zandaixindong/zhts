@@ -1,0 +1,16 @@
+services:
+  backend:
+    build:
+      context: .
+      dockerfile: backend/Dockerfile
+    container_name: ai-library-backend
+    restart: always
+    ports:
+      - "3001:3001"
+    environment:
+      - DATABASE_URL=file:./prisma/dev.db
+      - API_KEY=426b3899543a42f6ba4c9f617534b700.ufp4iLsJQc34zgeK
+      - MODEL_NAME=GLM-4.7-Flash
+      - NODE_ENV=production
+    volumes:
+      - ./prisma:/app/prisma

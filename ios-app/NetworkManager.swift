@@ -3,10 +3,10 @@ import Combine
 
 class NetworkManager: ObservableObject {
     @Published var isLoading = false
+    @Published var errorMessage: String? = nil
     
-    // ⚠️ 请在部署后修改此处的 URL 为您的云端地址
-    // 例如: "https://ai-library-backend.onrender.com/api"
-    private let baseURL = "http://localhost:3001/api"
+    // ⚠️ 您的云服务器 API 地址
+    @Published var baseURL = "http://115.190.223.252:3001/api"
     
     static let shared = NetworkManager()
     
@@ -24,13 +24,23 @@ class NetworkManager: ObservableObject {
         var request = URLRequest(url: url)
         request.httpMethod = method
         request.addValue("application/json", forHTTPHeaderField: "Content-Type")
+        request.timeoutInterval = 60 // 延长到 60 秒，避免 AI 接口超时
         
         if let body = body {
             request.httpBody = try? JSONSerialization.data(withJSONObject: body)
         }
         
         return URLSession.shared.dataTaskPublisher(for: request)
-            .map(\.data)
+            .tryMap { output in
+                guard let response = output.response as? HTTPURLResponse else {
+                    throw URLError(.badServerResponse)
+                }
+                if !(200...299).contains(response.statusCode) {
+                    print("⚠️ 请求失败: \(response.statusCode) \(endpoint)")
+                    throw URLError(.badServerResponse)
+                }
+                return output.data
+            }
             .decode(type: APIResponse<T>.self, decoder: decoder)
             .map(\.data)
             .receive(on: DispatchQueue.main)

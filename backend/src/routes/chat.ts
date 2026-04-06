@@ -115,7 +115,7 @@ router.post('/book-chat', async (req, res) => {
 4. 必须使用中文回答。`;
 
     const apiMessages: any[] = [
-      { role: 'system', content: systemPrompt },
+      { role: 'user', content: systemPrompt },
       ...(history || []),
       { role: 'user', content: message }
     ];

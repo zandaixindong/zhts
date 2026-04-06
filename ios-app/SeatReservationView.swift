@@ -58,7 +58,7 @@ struct SeatReservationView: View {
                                 }) {
                                     SeatIcon(seat: seat)
                                 }
-                                .buttonStyle(PlainButtonStyle()) // 避免按钮自带的高亮影响外观
+                                .buttonStyle(PlainButtonStyle())
                             }
                         }
                         .padding(20)
@@ -95,10 +95,15 @@ struct SeatReservationView: View {
     func reserveSeat() {
         guard let seat = selectedSeat else { return }
         isLoading = true
+        // 🛠️ 修复：更改接收数据类型为 ReserveSeatResponse，解决解析失败导致的“无法连接服务器”报错
         NetworkManager.shared.request("/seats/reserve", method: "POST", body: ["seatId": seat.id, "duration": 2, "userId": "demo-user-id"])
             .sink(receiveCompletion: { completion in
-                if case .failure = completion { self.hasError = true; self.isLoading = false }
-            }, receiveValue: { (res: APIResponse<String>) in 
+                if case .failure = completion { 
+                    self.hasError = true
+                    self.isLoading = false 
+                }
+            }, receiveValue: { (res: ReserveSeatResponse) in 
+                // 预约成功后，重新刷新当前楼层数据
                 if let floor = selectedFloor { selectFloor(floor) }
             })
             .store(in: &cancellables)

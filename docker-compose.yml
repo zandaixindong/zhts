@@ -12,5 +12,8 @@ services:
       - API_KEY=426b3899543a42f6ba4c9f617534b700.ufp4iLsJQc34zgeK
       - MODEL_NAME=GLM-4.7-Flash
       - NODE_ENV=production
+      - FRONTEND_URL=https://guhongli.top
+      - ADMIN_URL=https://admin.guhongli.top
+      - JWT_SECRET=ai-library-secret-7788 # 请在部署时修改为更复杂的随机字符串
     volumes:
       - ./prisma:/app/prisma

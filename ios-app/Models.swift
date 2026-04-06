@@ -1,12 +1,12 @@
 import Foundation
 
-// MARK: - API Wrapper
+// MARK: - API 基础响应包装
 struct APIResponse<T: Codable>: Codable {
     let success: Bool
     let data: T
 }
 
-// MARK: - Book Model
+// MARK: - 图书模型
 struct Book: Identifiable, Codable {
     let id: String
     let title: String
@@ -18,12 +18,13 @@ struct Book: Identifiable, Codable {
     let isbn: String?
 }
 
-// MARK: - AI Models
+// MARK: - AI 搜索响应
 struct AISearchResponse: Codable {
     let books: [Book]
     let message: String
 }
 
+// MARK: - AI 推荐模型
 struct AIRecommendation: Identifiable, Codable {
     var id: String { bookId }
     let bookId: String
@@ -38,6 +39,7 @@ struct AIRecommendationResponse: Codable {
     let message: String
 }
 
+// MARK: - 借阅画像
 struct AIPersona: Codable {
     let title: String
     let traits: [String]
@@ -45,7 +47,7 @@ struct AIPersona: Codable {
     let summary: String
 }
 
-// MARK: - Seat Models
+// MARK: - 座位与楼层
 struct Floor: Identifiable, Codable {
     let id: String
     let name: String
@@ -61,7 +63,14 @@ struct Seat: Identifiable, Codable {
     let window: Bool?
 }
 
-// MARK: - Activity Models
+// 🛠️ 关键修复：预约结果模型
+struct ReserveSeatResponse: Codable {
+    let success: Bool
+    let message: String
+    let seat: Seat?
+}
+
+// MARK: - 记录模型
 struct BorrowingRecord: Identifiable, Codable {
     let id: String
     let status: String
@@ -76,6 +85,8 @@ struct ReservationRecord: Identifiable, Codable {
     let endTime: String
     let seat: Seat
 }
+
+// MARK: - 聊天模型
 struct ChatMessage: Identifiable, Codable {
     var id = UUID()
     let role: String // user, assistant

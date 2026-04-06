@@ -30,4 +30,4 @@ EXPOSE 3001
 
 # 启动脚本：同步数据库并启动服务
 ENV NODE_OPTIONS="--max-old-space-size=450"
-CMD npx prisma db push && npm run start
+CMD npx prisma db push --accept-data-loss && npm run seed && npm run start

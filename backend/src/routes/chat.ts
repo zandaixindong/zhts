@@ -1,7 +1,7 @@
 import express from 'express';
 import { openai } from '../services/claude';
 import { searchTools, handleSearchToolCall } from '../tools/searchTools';
-import { ErrorCode, errorResponse } from '../types/response';
+import { ErrorCode, errorResponse, successResponse } from '../types/response';
 import { logger } from '../utils/logger';
 
 const router = express.Router();

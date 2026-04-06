@@ -55,6 +55,16 @@ ${searchResult.results}
 Please answer my question based on the documentation above.`,
     });
 
+    // Support synchronous response for iOS clients
+    if (req.query.stream === 'false') {
+      const response = await openai.chat.completions.create({
+        model: process.env.MODEL_NAME || 'glm-4',
+        max_tokens: 2048,
+        messages: apiMessages,
+      });
+      return res.json(successResponse({ text: response.choices[0]?.message?.content || '' }));
+    }
+
     // Set up streaming response
     res.writeHead(200, {
       'Content-Type': 'text/event-stream',
@@ -119,6 +129,17 @@ router.post('/book-chat', async (req, res) => {
       ...(history || []),
       { role: 'user', content: message }
     ];
+
+    // Support synchronous response for iOS clients
+    if (req.query.stream === 'false') {
+      const response = await openai.chat.completions.create({
+        model: process.env.MODEL_NAME || 'glm-4',
+        max_tokens: 1500,
+        messages: apiMessages,
+        temperature: 0.7,
+      });
+      return res.json(successResponse({ text: response.choices[0]?.message?.content || '' }));
+    }
 
     res.writeHead(200, {
       'Content-Type': 'text/event-stream',

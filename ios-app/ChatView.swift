@@ -72,83 +72,18 @@ struct ChatView: View {
         isTyping = true
         hasError = false
         
-        let assistantMsgId = UUID()
-        messages.append(ChatMessage(role: "assistant", content: ""))
-        
-        guard let url = URL(string: "\(NetworkManager.shared.baseURL)/chat") else { return }
-        var request = URLRequest(url: url)
-        request.httpMethod = "POST"
-        request.addValue("application/json", forHTTPHeaderField: "Content-Type")
-        
-        let body: [String: Any] = ["messages": [["role": "user", "content": text]], "userId": "demo-user-id"]
-        request.httpBody = try? JSONSerialization.data(withJSONObject: body)
-        
-        Task {
-            do {
-                let (bytes, response) = try await URLSession.shared.bytes(for: request)
-                
-                // 检查 HTTP 状态码
-                if let httpResponse = response as? HTTPURLResponse, httpResponse.statusCode != 200 {
-                    let statusCode = httpResponse.statusCode
-                    DispatchQueue.main.async {
-                        self.isTyping = false
-                        if let index = self.messages.firstIndex(where: { $0.id == assistantMsgId }) {
-                            self.messages[index] = ChatMessage(role: "assistant", content: "服务器返回错误代码：\(statusCode)")
-                        }
-                    }
-                    return
-                }
-
-                var currentResponse = ""
-                DispatchQueue.main.async { self.isTyping = false }
-                
-                for try await line in bytes.lines {
-                    if line.hasPrefix("data: ") {
-                        let dataStr = String(line.dropFirst(6))
-                        if dataStr == "[DONE]" { break }
-                        
-                        if let data = dataStr.data(using: .utf8) {
-                            do {
-                                if let json = try JSONSerialization.jsonObject(with: data) as? [String: Any],
-                                   let textChunk = json["text"] as? String {
-                                    
-                                    currentResponse += textChunk
-                                    // Copying string explicitly to avoid Swift 6 concurrency capture mutation warnings
-                                    let threadSafeText = String(currentResponse)
-                                    
-                                    DispatchQueue.main.async {
-                                        if let index = self.messages.firstIndex(where: { $0.id == assistantMsgId }) {
-                                            self.messages[index] = ChatMessage(role: "assistant", content: threadSafeText)
-                                        }
-                                    }
-                                }
-                            } catch {
-                                // Silent fail for JSON chunks
-                            }
-                        }
-                    }
-                }
-                
-                // 防御性检查：如果什么都没收到
-                let finalCheckText = String(currentResponse)
-                DispatchQueue.main.async {
-                    if finalCheckText.isEmpty {
-                        if let index = self.messages.firstIndex(where: { $0.id == assistantMsgId }) {
-                            self.messages[index] = ChatMessage(role: "assistant", content: "抱歉，由于 API 格式或响应问题未能加载内容。")
-                        }
-                    }
-                }
-
-            } catch {
-                DispatchQueue.main.async {
-                    self.isTyping = false
-                    self.hasError = true
-                    if let index = self.messages.firstIndex(where: { $0.id == assistantMsgId }) {
-                        self.messages.remove(at: index)
-                    }
-                }
-            }
+        struct ChatResponse: Codable {
+            let text: String
         }
+        
+        NetworkManager.shared.request("/chat?stream=false", method: "POST", body: ["messages": [["role": "user", "content": text]], "userId": "demo-user-id"])
+            .sink(receiveCompletion: { completion in
+                self.isTyping = false
+                if case .failure = completion { self.hasError = true }
+            }, receiveValue: { (res: ChatResponse) in
+                self.messages.append(ChatMessage(role: "assistant", content: res.text))
+            })
+            .store(in: &cancellables)
     }
 }
 

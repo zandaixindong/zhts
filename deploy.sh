@@ -15,23 +15,23 @@ mkdir -p /var/www/library/admin
 
 # 3. 构建前端项目
 echo "🏗️ 正在构建用户前台..."
-cd frontend && npm install && npm run build
+cd frontend && npm install && VITE_API_URL=https://guhongli.top/api npm run build
 if [ -d "dist" ]; then
     cp -r dist/* /var/www/library/frontend/
-    echo "✅ 用户前台构建成功并已同步到 /var/www/library/frontend"
+    echo "✅ 用户前台构建成功"
 else
-    echo "❌ 用户前台构建失败，请检查构建日志。"
+    echo "❌ 用户前台构建失败"
     exit 1
 fi
 cd ..
 
 echo "🏗️ 正在构建管理后台..."
-cd admin-frontend && npm install && npm run build
+cd admin-frontend && npm install && VITE_API_URL=https://guhongli.top/api npm run build
 if [ -d "dist" ]; then
     cp -r dist/* /var/www/library/admin/
-    echo "✅ 管理后台构建成功并已同步到 /var/www/library/admin"
+    echo "✅ 管理后台构建成功"
 else
-    echo "❌ 管理后台构建失败，请检查构建日志。"
+    echo "❌ 管理后台构建失败"
     exit 1
 fi
 cd ..

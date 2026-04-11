@@ -1,0 +1,15 @@
+sudo bash -c 'cat > /etc/nginx/sites-available/admin.guhongli.top << "EOF"
+server {
+    listen 80;
+    server_name admin.guhongli.top;
+
+    # 这里的路径必须和 deploy.sh 里拷贝进去的路径一模一样！
+    root /var/www/library/admin;
+    index index.html;
+
+    # 防止 React Router 在刷新网页时报 404
+    location / {
+        try_files $uri $uri/ /index.html;
+    }
+}
+EOF' && sudo ln -sf /etc/nginx/sites-available/admin.guhongli.top /etc/nginx/sites-enabled/ && sudo systemctl reload nginx

@@ -1,5 +1,5 @@
-# 使用 Node.js 官方镜像
-FROM node:20-slim
+# 使用 Node.js 官方镜像 (使用国内可用的代理仓库以防拉取失败)
+FROM m.daocloud.io/docker.io/library/node:20-slim
 
 # 安装 openssl (Prisma 必需)
 RUN apt-get update && apt-get install -y openssl && rm -rf /var/lib/apt/lists/*

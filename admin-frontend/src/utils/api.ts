@@ -8,6 +8,14 @@ const api = axios.create({
   withCredentials: true,
 });
 
+api.interceptors.request.use((config) => {
+  const token = localStorage.getItem('admin-token');
+  if (token) {
+    config.headers.Authorization = `Bearer ${token}`;
+  }
+  return config;
+});
+
 api.interceptors.response.use(
   (response) => {
     // Unwrap the successResponse wrapper from backend
@@ -18,6 +26,9 @@ api.interceptors.response.use(
   },
   (error) => {
     if (error.response && (error.response.status === 401 || error.response.status === 403)) {
+      // Clear all auth state to prevent infinite refresh loops
+      localStorage.removeItem('admin-storage');
+      localStorage.removeItem('admin-token');
       if (window.location.pathname !== '/login') {
         window.location.href = '/login';
       }

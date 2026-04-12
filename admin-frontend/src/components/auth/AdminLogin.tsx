@@ -17,11 +17,18 @@ const AdminLogin: React.FC = () => {
     try {
       const res = await authApi.login(email, password);
       const user = res.user;
+      const token = res.token;
+      
       if (!user || user.role !== 'admin') {
         setError('该账号不是管理员账号');
         setLoading(false);
         return;
       }
+      
+      if (token) {
+        localStorage.setItem('admin-token', token);
+      }
+      
       setCurrentAdmin(user);
     } catch {
       setError('邮箱或密码错误');
